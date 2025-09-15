@@ -1,0 +1,6 @@
+file-inventory
+file-inventory.txt
+testdir/
+*.exe
+*.out
+*.test
