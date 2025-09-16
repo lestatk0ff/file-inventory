@@ -50,6 +50,7 @@ func TestCobraCreateCommand(t *testing.T) {
 	if err := createCmd.Execute(); err != nil {
 		t.Fatalf("Cobra create command failed: %v", err)
 	}
+	defer os.Remove("test-inventory.txt")
 	data, err := os.ReadFile("test-inventory.txt")
 	if err != nil {
 		t.Fatalf("Failed to read output: %v", err)
