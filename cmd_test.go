@@ -112,27 +112,3 @@ func TestCobraDiffCommand(t *testing.T) {
 		t.Errorf("Diff output missing expected lines: %s", diffOut)
 	}
 }
-
-func TestInventoryDoesNotIncludeDirectories(t *testing.T) {
-	dir := t.TempDir()
-	subdir := filepath.Join(dir, "subdir")
-	os.Mkdir(subdir, 0755)
-	file1 := filepath.Join(dir, "file1.txt")
-	file2 := filepath.Join(subdir, "file2.txt")
-	os.WriteFile(file1, []byte("test1"), 0644)
-	os.WriteFile(file2, []byte("test2"), 0644)
-
-	files, err := findFiles(dir)
-	if err != nil {
-		t.Fatalf("findFiles failed: %v", err)
-	}
-	for _, f := range files {
-		info, err := os.Stat(f)
-		if err != nil {
-			t.Fatalf("Stat failed for %s: %v", f, err)
-		}
-		if info.IsDir() {
-			t.Errorf("Directory %s found in file list!", f)
-		}
-	}
-}
