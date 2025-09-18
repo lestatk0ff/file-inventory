@@ -4,36 +4,22 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olekukonko/tablewriter/tw"
 )
 
 // showDiff compares two files and prints lines unique to each in table format
-func showDiff(file1, file2 string) {
-	set1 := make(map[string]struct{})
-	set2 := make(map[string]struct{})
-
-	f1, err := os.Open(file1)
+func showDiff(file1, file2 string) error {
+	set1, err := readFileLines(file1)
 	if err != nil {
-		fmt.Printf("Error opening %s: %v\n", file1, err)
-		os.Exit(1)
+		return fmt.Errorf("error reading %s: %w", file1, err)
 	}
-	defer f1.Close()
-	f2, err := os.Open(file2)
-	if err != nil {
-		fmt.Printf("Error opening %s: %v\n", file2, err)
-		os.Exit(1)
-	}
-	defer f2.Close()
 
-	scanner1 := bufio.NewScanner(f1)
-	for scanner1.Scan() {
-		set1[scanner1.Text()] = struct{}{}
-	}
-	scanner2 := bufio.NewScanner(f2)
-	for scanner2.Scan() {
-		set2[scanner2.Text()] = struct{}{}
+	set2, err := readFileLines(file2)
+	if err != nil {
+		return fmt.Errorf("error reading %s: %w", file2, err)
 	}
 
 	// Collect all unique files
@@ -48,6 +34,13 @@ func showDiff(file1, file2 string) {
 			allFiles[line] = struct{}{}
 		}
 	}
+
+	// Sort files for consistent output
+	var sortedFiles []string
+	for filePath := range allFiles {
+		sortedFiles = append(sortedFiles, filePath)
+	}
+	sort.Strings(sortedFiles)
 
 	// Create table
 	table := tablewriter.NewWriter(os.Stdout)
@@ -65,7 +58,7 @@ func showDiff(file1, file2 string) {
 	table.Header("file_path", file1, file2)
 
 	// Add differences to table
-	for filePath := range allFiles {
+	for _, filePath := range sortedFiles {
 		_, inFile1 := set1[filePath]
 		_, inFile2 := set2[filePath]
 
@@ -84,4 +77,30 @@ func showDiff(file1, file2 string) {
 	}
 
 	table.Render()
+	return nil
+}
+
+// readFileLines reads a file and returns a set of its lines
+func readFileLines(filename string) (map[string]struct{}, error) {
+	set := make(map[string]struct{})
+
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line != "" { // Skip empty lines
+			set[line] = struct{}{}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("error reading file: %w", err)
+	}
+
+	return set, nil
 }

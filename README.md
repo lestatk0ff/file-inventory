@@ -13,6 +13,10 @@
 - **Clean output**: Outputs file paths one per line for easy processing
 - **Professional diff display**: Shows differences in a formatted table with clear indicators
 - **Cross-platform**: Works on Windows, macOS, and Linux
+- **Flexible filtering**: Include/exclude files using glob patterns
+- **Path options**: Support for relative paths and hidden files
+- **Sorted output**: Optional alphabetical sorting of file paths
+- **Robust error handling**: Graceful handling of permission errors and invalid inputs
 - **No external dependencies** for basic functionality
 
 
@@ -21,15 +25,30 @@
 ### Create inventory file
 
 ```
-file-inventory create DIR_PATH [-o OUTPUT_FILE]
+file-inventory create DIR_PATH [flags]
 ```
 
-- `DIR_PATH`: Directory to scan
-- `-o OUTPUT_FILE`: (Optional) Output file name (default: file-inventory.txt)
+**Flags:**
+- `-o, --output string`: Output file name (default: file-inventory.txt)
+- `--sort`: Sort file paths alphabetically in output
+- `--relative`: Use relative paths from scan directory
+- `--hidden`: Include hidden files and directories
+- `--include strings`: Include only files matching these glob patterns
+- `--exclude strings`: Exclude files matching these glob patterns
 
-Example:
-```
-file-inventory create ./mydir -o inventory1
+**Examples:**
+```bash
+# Basic usage
+file-inventory create ./mydir -o inventory1.txt
+
+# Sort output and use relative paths
+file-inventory create ./mydir --sort --relative -o inventory1.txt
+
+# Include only text files, including hidden ones
+file-inventory create ./mydir --include "*.txt" --hidden -o inventory1.txt
+
+# Exclude all .log and .tmp files
+file-inventory create ./mydir --exclude "*.log" --exclude "*.tmp" -o inventory1.txt
 ```
 
 ### Diff two inventory files
@@ -87,15 +106,15 @@ go test -v ./...
 ```
 
 Run specific test categories:
-```
-# Test CLI commands
-go test -v -run "TestCobra"
+```bash
+# Test CLI commands and integration
+go test -v -run "TestRun|TestCobra"
 
-# Test file utilities
-go test -v -run "TestFind|TestInventory|TestWrite"
+# Test file utilities and configuration
+go test -v -run "TestFind|TestWrite|TestConfig"
 
 # Test diff functionality
-go test -v -run "TestShowDiff"
+go test -v -run "TestShowDiff|TestReadFileLines"
 ```
 
 
