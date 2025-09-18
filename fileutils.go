@@ -38,7 +38,7 @@ func writeFileList(filename string, files []string) error {
 }
 
 func findFiles(dirPath string) ([]string, error) {
-	return findFilesWithConfig(dirPath, Config{})
+	return findFilesWithConfig(dirPath, Config{RelativePaths: true})
 }
 
 func findFilesWithConfig(dirPath string, config Config) ([]string, error) {
@@ -49,10 +49,16 @@ func findFilesWithConfig(dirPath string, config Config) ([]string, error) {
 		return nil, fmt.Errorf("%q is not a directory", dirPath)
 	}
 
+	// Convert to absolute path for consistent behavior
+	absDirPath, err := filepath.Abs(dirPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get absolute path: %w", err)
+	}
+
 	var files []string
 	var count int
 
-	err := filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
+	err = filepath.WalkDir(absDirPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			// Log warning but continue processing
 			fmt.Fprintf(os.Stderr, "Warning: skipping %q: %v\n", path, err)
@@ -76,7 +82,7 @@ func findFilesWithConfig(dirPath string, config Config) ([]string, error) {
 		// Convert to relative path if requested
 		finalPath := path
 		if config.RelativePaths {
-			if relPath, err := filepath.Rel(dirPath, path); err == nil {
+			if relPath, err := filepath.Rel(absDirPath, path); err == nil {
 				finalPath = relPath
 			}
 		}

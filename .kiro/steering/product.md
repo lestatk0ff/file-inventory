@@ -11,7 +11,7 @@
 - Professional table-formatted diff output with clear visual indicators
 - Cross-platform compatibility (Windows, macOS, Linux)
 - Flexible filtering with glob patterns (include/exclude)
-- Path options (relative paths, hidden files)
+- Path options (relative paths by default, full paths optional, hidden files)
 - Sorted output capability
 - Robust error handling and input validation
 - Minimal external dependencies

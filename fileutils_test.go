@@ -174,9 +174,14 @@ func TestInventoryDoesNotIncludeDirectories(t *testing.T) {
 		t.Fatalf("findFiles failed: %v", err)
 	}
 	for _, f := range files {
-		info, err := os.Stat(f)
+		// Convert relative path to absolute for stat check
+		fullPath := f
+		if !filepath.IsAbs(f) {
+			fullPath = filepath.Join(dir, f)
+		}
+		info, err := os.Stat(fullPath)
 		if err != nil {
-			t.Fatalf("Stat failed for %s: %v", f, err)
+			t.Fatalf("Stat failed for %s: %v", fullPath, err)
 		}
 		if info.IsDir() {
 			t.Errorf("Directory %s found in file list!", f)
@@ -258,6 +263,48 @@ func TestRelativePaths(t *testing.T) {
 	for _, f := range files {
 		if filepath.IsAbs(f) {
 			t.Errorf("Expected relative path, got absolute: %s", f)
+		}
+	}
+}
+
+func TestFullPaths(t *testing.T) {
+	dir := t.TempDir()
+	subdir := filepath.Join(dir, "subdir")
+	os.Mkdir(subdir, 0755)
+	file1 := filepath.Join(dir, "file1.txt")
+	file2 := filepath.Join(subdir, "file2.txt")
+	os.WriteFile(file1, []byte("test1"), 0644)
+	os.WriteFile(file2, []byte("test2"), 0644)
+
+	config := Config{RelativePaths: false}
+	files, err := findFilesWithConfig(dir, config)
+	if err != nil {
+		t.Fatalf("findFilesWithConfig failed: %v", err)
+	}
+
+	// All paths should be absolute
+	for _, f := range files {
+		if !filepath.IsAbs(f) {
+			t.Errorf("Expected absolute path, got relative: %s", f)
+		}
+	}
+}
+
+func TestDefaultBehaviorIsRelative(t *testing.T) {
+	dir := t.TempDir()
+	file1 := filepath.Join(dir, "file1.txt")
+	os.WriteFile(file1, []byte("test1"), 0644)
+
+	// Default config should use relative paths
+	files, err := findFiles(dir)
+	if err != nil {
+		t.Fatalf("findFiles failed: %v", err)
+	}
+
+	// Should have relative paths by default
+	for _, f := range files {
+		if filepath.IsAbs(f) {
+			t.Errorf("Expected relative path by default, got absolute: %s", f)
 		}
 	}
 }

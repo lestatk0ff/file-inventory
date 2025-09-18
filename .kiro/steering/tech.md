@@ -39,8 +39,11 @@ go install
 # Basic create inventory
 file-inventory create ./mydir -o inventory1.txt
 
-# Advanced create with filtering and options
-file-inventory create ./mydir --sort --relative --include "*.txt" --exclude "*.log" -o inventory1.txt
+# Advanced create with filtering and options (relative paths by default)
+file-inventory create ./mydir --sort --include "*.txt" --exclude "*.log" -o inventory1.txt
+
+# Use full absolute paths
+file-inventory create ./mydir --full --sort -o inventory1.txt
 
 # Compare inventories
 file-inventory diff inventory1.txt inventory2.txt

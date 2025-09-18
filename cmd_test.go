@@ -30,9 +30,9 @@ func TestRunCreateCommand(t *testing.T) {
 			expectCount: 3,
 		},
 		{
-			name:        "with relative paths",
+			name:        "with full paths",
 			setupFiles:  []string{"file1.txt", "sub/file2.txt"},
-			config:      Config{RelativePaths: true},
+			config:      Config{RelativePaths: false},
 			expectCount: 2,
 		},
 		{
@@ -159,7 +159,7 @@ func TestCobraCreateCommand(t *testing.T) {
 	// Test the actual cobra command
 	var output string
 	var sortOutput bool
-	var relativePaths bool
+	var fullPaths bool
 	var includeHidden bool
 	var excludePatterns []string
 	var includePatterns []string
@@ -171,7 +171,7 @@ func TestCobraCreateCommand(t *testing.T) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCreateCommand(args[0], output, Config{
 				SortOutput:      sortOutput,
-				RelativePaths:   relativePaths,
+				RelativePaths:   !fullPaths,
 				IncludeHidden:   includeHidden,
 				ExcludePatterns: excludePatterns,
 				IncludePatterns: includePatterns,
@@ -181,7 +181,7 @@ func TestCobraCreateCommand(t *testing.T) {
 
 	createCmd.Flags().StringVarP(&output, "output", "o", "file-inventory.txt", "Output file name")
 	createCmd.Flags().BoolVar(&sortOutput, "sort", false, "Sort file paths in output")
-	createCmd.Flags().BoolVar(&relativePaths, "relative", false, "Use relative paths from scan directory")
+	createCmd.Flags().BoolVar(&fullPaths, "full", false, "Use full absolute paths (default: relative paths)")
 	createCmd.Flags().BoolVar(&includeHidden, "hidden", false, "Include hidden files and directories")
 	createCmd.Flags().StringSliceVar(&excludePatterns, "exclude", []string{}, "Exclude patterns (glob)")
 	createCmd.Flags().StringSliceVar(&includePatterns, "include", []string{}, "Include patterns (glob)")

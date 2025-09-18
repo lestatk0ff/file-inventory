@@ -31,18 +31,18 @@ file-inventory create DIR_PATH [flags]
 **Flags:**
 - `-o, --output string`: Output file name (default: file-inventory.txt)
 - `--sort`: Sort file paths alphabetically in output
-- `--relative`: Use relative paths from scan directory
+- `--full`: Use full absolute paths (default: relative paths from scan directory)
 - `--hidden`: Include hidden files and directories
 - `--include strings`: Include only files matching these glob patterns
 - `--exclude strings`: Exclude files matching these glob patterns
 
 **Examples:**
 ```bash
-# Basic usage
+# Basic usage (uses relative paths by default)
 file-inventory create ./mydir -o inventory1.txt
 
-# Sort output and use relative paths
-file-inventory create ./mydir --sort --relative -o inventory1.txt
+# Sort output and use full absolute paths
+file-inventory create ./mydir --sort --full -o inventory1.txt
 
 # Include only text files, including hidden ones
 file-inventory create ./mydir --include "*.txt" --hidden -o inventory1.txt

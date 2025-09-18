@@ -18,7 +18,7 @@ func main() {
 	var (
 		output          string
 		sortOutput      bool
-		relativePaths   bool
+		fullPaths       bool
 		includeHidden   bool
 		excludePatterns []string
 		includePatterns []string
@@ -32,7 +32,7 @@ func main() {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCreateCommand(args[0], output, Config{
 				SortOutput:      sortOutput,
-				RelativePaths:   relativePaths,
+				RelativePaths:   !fullPaths, // Default to relative paths unless --full is specified
 				IncludeHidden:   includeHidden,
 				ExcludePatterns: excludePatterns,
 				IncludePatterns: includePatterns,
@@ -42,7 +42,7 @@ func main() {
 
 	createCmd.Flags().StringVarP(&output, "output", "o", "file-inventory.txt", "Output file name")
 	createCmd.Flags().BoolVar(&sortOutput, "sort", false, "Sort file paths in output")
-	createCmd.Flags().BoolVar(&relativePaths, "relative", false, "Use relative paths from scan directory")
+	createCmd.Flags().BoolVar(&fullPaths, "full", false, "Use full absolute paths (default: relative paths)")
 	createCmd.Flags().BoolVar(&includeHidden, "hidden", false, "Include hidden files and directories")
 	createCmd.Flags().StringSliceVar(&excludePatterns, "exclude", []string{}, "Exclude patterns (glob)")
 	createCmd.Flags().StringSliceVar(&includePatterns, "include", []string{}, "Include patterns (glob)")
