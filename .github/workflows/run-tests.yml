@@ -1,4 +1,4 @@
-name: File-inventory CI
+name: Running tests
 
 on:
   push:
