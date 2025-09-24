@@ -51,6 +51,7 @@ file-inventory create ./mydir --include "*.txt" --hidden -o inventory1.txt
 file-inventory create ./mydir --exclude "*.log" --exclude "*.tmp" -o inventory1.txt
 ```
 
+
 ### Diff two inventory files
 
 ```
