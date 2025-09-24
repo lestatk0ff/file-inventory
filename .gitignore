@@ -4,3 +4,9 @@ testdir/
 *.exe
 *.out
 *.test
+
+# Ignore Kiro
+.kiro
+
+# Ignore vscode settings
+.vscode
